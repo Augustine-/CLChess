@@ -3,12 +3,13 @@ class Board
   def initialize(size, bombs)
     @size = size
     @bombs = bombs
-    spawn
+    @board = []
+    spawn(size[1])
   end
 
-  def spawn
-    @board = Array.new(@size[0] * @size[1]) do |tile|
-      tile = Tile.new('blank')
+  def spawn(num_rows)
+    num_rows.times do |row|
+      @board << Array.new(@size[0]) { Tile.new("B") }
     end
   end
 
@@ -33,7 +34,7 @@ class Game
   end
 end
 
-b = Board.new([2, 2], 0)
+b = Board.new([2, 3], 0)
 
 
-b.board.each {|i| puts i.type}
+puts b.board.to_s
