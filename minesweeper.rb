@@ -7,7 +7,9 @@ class Board
     @columns = columns
     @board = set_board_area
     drop_the_bombs(bombs)
+    number_the_tiles
   end
+
 
   def set_board_area
     [].tap do |board|
@@ -17,40 +19,86 @@ class Board
     end
   end
 
-  def drop_the_bombs(bomb_count)         #populate the board with bombs
+  #populate the board with bombs
+  def drop_the_bombs(bomb_count)
     bomb_count.times do
       @board.sample.sample.bombed = true
     end
   end
 
+  #Sets the near bomb value for all tiles
+  def number_the_tiles
+    @board.each_with_index do |row, row_idx|
+      row.each_with_index do |tile, tile_idx|
+        all_neighbors =  check_neighbors([row_idx, tile_idx])
+        puts all_neighbors
+        tile.near_bombs = bombed_neighbors(all_neighbors)
+      end
+    end
+  end
+
+  #Translates the board into display values
   def show
     @board.each do |line|
       puts line.display
     end
   end
 
-  def to_s
-    size.to_s
+  #Finds coordinates of all non-negative neighbors.
+  def check_neighbors(coordinate)
+    row, col = coordinate[0], coordinate[1]
+    all_neighbors = [[row + 1, col],
+    [row - 1, col],
+    [row, col + 1],
+    [row, col - 1],
+    [row + 1, col - 1],
+    [row - 1, col + 1],
+    [row - 1, col - 1],
+    [row + 1, col + 1]]
+
+    all_neighbors.map! do |coord_pair|
+      coord_pair.any? { |coordinate|  coordinate < 0 }
+        coord_pair = nil
+      end
+
+
+    all_neighbors.compact
   end
+
+  #Finds count of neighbors.
+  def bombed_neighbors(all_neighbors)
+    bombs = 0
+    all_neighbors.each do |coord|
+
+
+      bombs += 1 if @board[coord[0]][coord[1]].bombed
+    end
+    return bombs
+  end
+
 end
 
 class Tile
-  attr_accessor :bombed, :flagged, :revealed
+  attr_accessor :bombed, :flagged, :revealed, :near_bombs
+
   def initialize
     @bombed = false
     @flagged = false
     @revealed = false
-    #@display =
+    @near_bombs = 0
   end
 
-  def to_s
-    if @revealed && @bombed
-      return 'B'
-    elsif @flagged
-      return 'F'
-    end
-    return 'O'
-  end
+  # def to_s
+  #   if @revealed && @bombed
+  #     return 'B'
+  #   elsif @revealed && @bombed == false
+  #     return @number
+  #   elsif @flagged
+  #     return 'F'
+  #   end
+  #   return 'O'
+  # end
+
 end
 
 class Game
@@ -70,6 +118,7 @@ class Game
     end
     puts "You lost" if lost?
   end
+
 
 
   def input
