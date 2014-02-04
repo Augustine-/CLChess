@@ -8,9 +8,14 @@ NORTHWEST = [-1, 1]
 SOUTHWEST = [-1, -1]
 
 class Piece
-  attr_accessor :position, :sigil
-  def initialize(coords)
+  attr_accessor :position, :sigil, :grid
+  def initialize(coords, board)
     @position = coords[0], coords[1]
+    @grid = board.grid
+
+
+
+
   end
 
   def moves
@@ -87,20 +92,34 @@ class Board
   end
 
   def setup_pieces
+    place_piece
   end
 
-  def place_piece(position)
-    piece = Rook.new
-    @grid[position[0]][position[1]] = piece
-    piece.position = position
+  def move_piece(args)
+
   end
 
-  def show
-    pp grid
+
+  def place_piece(position, sigil)
+    case sigil
+    when 'rook'
+      piece = Rook.new(position, self)
+    when 'knight'
+      piece = Knight.new(position, self)
+    when 'bishop'
+      piece = Bishop.new(position, self)
+    when 'queen'
+      piece = Queen.new(position, self)
+    when 'pawn'
+      piece = Pawn.new(position, self)
+    when 'king'
+      piece = King.new(position, self)
+    end
+
+    self[position] = piece
   end
 
   def render
-
     display = @grid.map do |row|
       row.map do |square|
         if square.nil?
