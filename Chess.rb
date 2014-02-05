@@ -8,8 +8,8 @@ EAST             = [1 , 0]
 WEST             = [-1 , 0]
 NORTHEAST        = [1 , 1]
 SOUTHEAST        = [1 , -1]
-NORTHWEST        = [-1, 1]
-SOUTHWEST        = [-1, -1]
+NORTHWEST        = [-1 , 1]
+SOUTHWEST        = [-1 , -1]
 
 class Array
   def merge_sum
@@ -105,10 +105,23 @@ end
 class Knight < SteppingPiece
   attr_accessor :sigil
 
+  DELTAS = [
+    [-2, -1],
+    [-2,  1],
+    [-1, -2],
+    [-1,  2],
+    [ 1, -2],
+    [ 1,  2],
+    [ 2, -1],
+    [ 2,  1]
+  ]
+
   def initialize(position, board, team)
     super
     @sigil = team == "white" ?  "\u{265E} ".colorize(:red) : "\u{265E} ".colorize(:blue)
   end
+
+
 end
 
 class King < SteppingPiece
@@ -120,7 +133,12 @@ class King < SteppingPiece
   end
 end
 
-
+class Pawn < Piece
+  def initialize(position, board, team)
+    super
+   @sigil = team == "white" ? "\u{265F} ".colorize(:red) : "\u{265F} ".colorize(:blue)
+  end
+end
 
 
 

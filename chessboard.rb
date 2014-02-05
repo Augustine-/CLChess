@@ -29,11 +29,14 @@ class Board
     place_piece([0,2], 'bishop', 'white')
     place_piece([0,5], 'bishop', 'white')
     place_piece([7,2], 'bishop', 'black')
-    place_piece([7,5],'bishop', 'black')
-    place_piece([0,3],'king','white')
-    place_piece([7,3], 'king','black')
+    place_piece([7,5], 'bishop', 'black')
+    place_piece([0,3], 'king', 'white')
+    place_piece([7,3], 'king', 'black')
     place_piece([0,4], 'queen', 'white')
-    place_piece([7,4],'queen','black')
+    place_piece([7,4], 'queen', 'black')
+    8.times{ |y| place_piece([1,y], 'pawn', 'white') }
+    8.times{ |y| place_piece([6,y], 'pawn', 'black') }
+
   end
 
   #calls 'moves' on piece
@@ -46,7 +49,6 @@ class Board
       raise "Another piece is in the way"
     end
   end
-
 
   def place_piece(position, sigil, team)
     case sigil
