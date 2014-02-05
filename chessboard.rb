@@ -7,6 +7,43 @@ class Board
     setup_pieces
   end
 
+  def d_dup
+    duped_grid = []
+    self.grid.each do |row|
+
+      duped_row = row.map do |square|
+        square.dup unless square.nil?
+      end
+      duped_grid << duped_row
+    end
+    d = Board.new
+    d.grid = duped_grid
+    p "dddup"
+    d.render
+    d
+  end
+
+  def move_into_check(start_pos, end_pos, team)
+    duped_board = self.d_dup
+    duped_board.dup_move(start_pos, end_pos, team)
+    if duped_board.in_check?(team)
+      return true
+    end
+    false
+  end
+
+  def dup_move(start_pos, end_pos, team)
+    piece_to_move = self[start_pos]
+    if piece_to_move.moves.include?(end_pos)
+      self[end_pos] = piece_to_move
+      self[start_pos] = nil
+      piece_to_move.position = end_pos[0], end_pos[1]
+    else
+      raise "Invalid move."
+    end
+    false
+  end
+
   def [](coordinates)
     x, y = coordinates
     @grid[x][y]
@@ -39,15 +76,18 @@ class Board
   end
 
   #calls 'moves' on piece
-  def move_piece( start_pos, end_pos )
+  def move_piece( start_pos, end_pos, team )
     raise "no piece there" if self[start_pos].nil?
+    if move_into_check( start_pos, end_pos, self[start_pos].team )
+      raise "cant move into check"
+    end
     piece_to_move = self[start_pos]
     if piece_to_move.moves.include?(end_pos)
       # if self[end_pos].team != self.team
       #
       self[end_pos] = piece_to_move
       self[start_pos] = nil
-      p end_pos
+
       piece_to_move.position = end_pos[0], end_pos[1]
     else
       raise "Invalid move."
@@ -130,3 +170,5 @@ class Board
 
 end
 
+class Game
+end

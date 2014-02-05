@@ -164,7 +164,14 @@ end
 class King < SteppingPiece
   attr_accessor :sigil
 
-  KDELTS = [[-1, -1],[-1, 1],[1, -1],[1, 1],[-1, 0],[1, 0],[0, -1],[0, 1]]
+  KDELTS = [[-1, -1],
+  [-1, 1],
+  [1, -1],
+  [1, 1],
+  [-1, 0],
+  [1, 0],
+  [0, -1],
+  [0, 1]]
 
 
   def initialize(position, board, team)
@@ -270,11 +277,7 @@ soclose = [0,3]
     # b.move_piece([0,3], [2, 2])
     # b.render
 
-p b.move_piece(start, ends)
-b.render
-p b.move_piece(ends, go)
-b.render
-p b.move_piece(go, gogo)
+    b.move_piece([7,3],[6,4], "blue")
 b.render
 p b.in_check?("red")
 
