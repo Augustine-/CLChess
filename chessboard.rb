@@ -20,9 +20,10 @@ class Board
     place_piece
   end
 
+  #calls 'moves' on piece
   def move_piece( start_pos, end_pos )
     piece_to_move = self[start_pos]
-    if piece_to_move.moves(start_pos, end_pos) == true
+    if piece_to_move.moves.include?(end_pos)
       self[end_pos]= piece_to_move
       self[start_pos]= nil
     else
