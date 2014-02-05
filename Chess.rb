@@ -1,4 +1,5 @@
 require "./chessboard.rb"
+require "colorize"
 require "debugger"
 
 NORTH            = [0, 1]
@@ -10,28 +11,20 @@ SOUTHEAST        = [1 , -1]
 NORTHWEST        = [-1, 1]
 SOUTHWEST        = [-1, -1]
 
-
 class Array
   def merge_sum
     self.transpose.map {|x| x.reduce(:+)}
   end
 end
 
-
 class Piece
-  attr_accessor :position, :sigil, :grid
+  attr_accessor :position, :sigil, :grid, :team
 
-  def initialize(coords, board)
+  def initialize(coords, board, team)
     @position    = coords[0], coords[1]
     @board        = board
+    @team = team
   end
-
-  #called by Board::move_piece
-  #calls cardinal_directions
-  def moves
-
-  end
-
 
 end
 
@@ -53,31 +46,28 @@ class SlidingPiece < Piece
     cards
   end
 
-
   #called by 'moves
-#calls 'legal_moves'
-def cardinal_directions
-  legal_moves(NORTH) +
-  legal_moves(EAST) +
-  legal_moves(SOUTH) +
-  legal_moves(WEST)
+  #calls 'legal_moves'
+  def cardinal_directions
+    legal_moves(NORTH) +
+    legal_moves(EAST) +
+    legal_moves(SOUTH) +
+    legal_moves(WEST)
+  end
+
+  def diagonal_directions
+    legal_moves(NORTHWEST) +
+    legal_moves(NORTHEAST) +
+    legal_moves(SOUTHWEST) +
+    legal_moves(SOUTHEAST)
+  end
 end
-
-def diagonal_directions
-  legal_moves(NORTHWEST) +
-  legal_moves(NORTHEAST) +
-  legal_moves(SOUTHWEST) +
-  legal_moves(SOUTHEAST)
-end
-
-
-
-end
-
-
-
 
 class Bishop < SlidingPiece
+  def initialize(position, board, team)
+    super
+   @sigil = team == "white" ? "\u{265D} ".colorize(:red) : "\u{265D} ".colorize(:blue)
+  end
 
   def moves
     diagonal_directions
@@ -88,14 +78,22 @@ end
 class Rook < SlidingPiece
   attr_accessor :sigil
 
-  def initialize(position, board)
-    @position    = position
-    @board       = board
-    @sigil       = "R"
+  def initialize(position, board, team)
+    super
+    @sigil = team == "white" ?  "\u{265C} ".colorize(:red) : "\u{265C} ".colorize(:blue)
   end
 
   def moves
     cardinal_directions
+  end
+end
+
+class Queen < SlidingPiece
+  attr_accessor :sigil
+
+  def initialize(position, board, team)
+    super
+    @sigil = team == "white" ?  "\u{265B} ".colorize(:red) : "\u{265B} ".colorize(:blue)
   end
 
 
@@ -103,18 +101,10 @@ end
 
 
 
+
+
 b = Board.new
 
-b.place_piece([2,2],'rook')
-pp b.render
+b.render
 
-b.move_piece([2, 2], [2, 4])
-pp b.render
-
-# b.place_piece([1, 0],'rook')
-# pp "before move"
-# pp b.render
-# b.move_piece([1,0], [1,5])
-# pp "after move"
-# pp b.render
 
