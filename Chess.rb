@@ -28,6 +28,9 @@ class Piece
 
 end
 
+class SteppingPiece <Piece
+end
+
 class SlidingPiece < Piece
 
   #called by cardinal_directions
@@ -97,6 +100,24 @@ class Queen < SlidingPiece
   end
 
 
+end
+
+class Knight < SteppingPiece
+  attr_accessor :sigil
+
+  def initialize(position, board, team)
+    super
+    @sigil = team == "white" ?  "\u{265E} ".colorize(:red) : "\u{265E} ".colorize(:blue)
+  end
+end
+
+class King < SteppingPiece
+  attr_accessor :sigil
+
+  def initialize(position, board, team)
+    super
+    @sigil = team == "white" ?  "\u{265A} ".colorize(:red) : "\u{265A} ".colorize(:blue)
+  end
 end
 
 
