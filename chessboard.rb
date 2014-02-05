@@ -18,25 +18,24 @@ class Board
   end
 
   def setup_pieces
-    place_piece([0,0], 'rook', 'white')
-    place_piece([0,7], 'rook', 'white')
-    place_piece([7,0], 'rook', 'black')
-    place_piece([7,7], 'rook', 'black')
-    place_piece([0,6], 'knight', 'white')
-    place_piece([0,1], 'knight', 'white')
-    place_piece([7,1], 'knight', 'black')
-    place_piece([7,6], 'knight', 'black')
-    place_piece([0,2], 'bishop', 'white')
-    place_piece([0,5], 'bishop', 'white')
-    place_piece([7,2], 'bishop', 'black')
-    place_piece([7,5], 'bishop', 'black')
-    place_piece([0,3], 'king', 'white')
-    place_piece([7,3], 'king', 'black')
-    place_piece([0,4], 'queen', 'white')
-    place_piece([7,4], 'queen', 'black')
-    8.times{ |y| place_piece([1,y], 'pawn', 'white') }
-    8.times{ |y| place_piece([6,y], 'pawn', 'black') }
-
+    place_piece([0,0], 'rook', 'red')
+    place_piece([0,7], 'rook', 'red')
+    place_piece([7,0], 'rook', 'blue')
+    place_piece([7,7], 'rook', 'blue')
+    place_piece([0,6], 'knight', 'red')
+    place_piece([0,1], 'knight', 'red')
+    place_piece([7,1], 'knight', 'blue')
+    place_piece([7,6], 'knight', 'blue')
+    place_piece([0,2], 'bishop', 'red')
+    place_piece([0,5], 'bishop', 'red')
+    place_piece([7,2], 'bishop', 'blue')
+    place_piece([7,5], 'bishop', 'blue')
+    place_piece([0,3], 'king', 'red')
+    place_piece([7,3], 'king', 'blue')
+    place_piece([0,4], 'queen', 'red')
+    place_piece([7,4], 'queen', 'blue')
+    # 8.times{ |y| place_piece([1,y], 'pawn', 'red') }
+ #    8.times{ |y| place_piece([6,y], 'pawn', 'blue') }
   end
 
   #calls 'moves' on piece
@@ -85,6 +84,7 @@ class Board
         end
       end
     end
+
     display.each_with_index do |row, ind|
       row.map!.with_index do
         |x,i| if ind.odd? && i.odd?
@@ -102,6 +102,31 @@ class Board
     display.each_with_index{|row, ind| puts "#{ind} #{row}"}
     puts "  0 1 2 3 4 5 6 7 <= Y"
   end
+
+  def find_king(color)
+
+    self.grid.each_with_index do |row, row_index|
+      row.each do |item|
+        if item.class == King && item.team == color
+          #puts "Row and column of #{color} king: #{item.position}"
+          return item.position
+        end
+      end
+    end
+
+  end
+
+  def in_check?(color)
+    @grid.each do |row|
+      row.each do |square|
+        unless square.nil?
+          return true if square.moves.include?(find_king(color))
+        end
+      end
+    end
+    false
+  end
+
 
 end
 
