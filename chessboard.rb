@@ -41,12 +41,17 @@ class Board
 
   #calls 'moves' on piece
   def move_piece( start_pos, end_pos )
+    raise "no piece there" if self[start_pos].nil?
     piece_to_move = self[start_pos]
     if piece_to_move.moves.include?(end_pos)
-      self[end_pos]= piece_to_move
-      self[start_pos]= nil
+      # if self[end_pos].team != self.team
+      #
+      self[end_pos] = piece_to_move
+      self[start_pos] = nil
+      p end_pos
+      piece_to_move.position = end_pos[0], end_pos[1]
     else
-      raise "Another piece is in the way"
+      raise "Invalid move."
     end
   end
 
@@ -91,9 +96,11 @@ class Board
          end
        end
     end
-
+    puts "X"
     display.map!{|row|  row.join('') }
-    display.each{|row| puts row}
+
+    display.each_with_index{|row, ind| puts "#{ind} #{row}"}
+    puts "  0 1 2 3 4 5 6 7 <= Y"
   end
 
 end
