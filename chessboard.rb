@@ -1,4 +1,5 @@
 require "colorize"
+require "debugger"
 
 class Board
   attr_accessor :grid
@@ -18,12 +19,10 @@ class Board
     end
     d = Board.new
     d.grid = duped_grid
-    p "dddup"
-    d.render
     d
   end
 
-  def move_into_check(start_pos, end_pos, team)
+  def move_into_check?(start_pos, end_pos, team)
     duped_board = self.d_dup
     duped_board.dup_move(start_pos, end_pos, team)
     if duped_board.in_check?(team)
@@ -71,26 +70,25 @@ class Board
     place_piece([7,3], 'king', 'blue')
     place_piece([0,4], 'queen', 'red')
     place_piece([7,4], 'queen', 'blue')
-    # 8.times{ |y| place_piece([1,y], 'pawn', 'red') }
- #    8.times{ |y| place_piece([6,y], 'pawn', 'blue') }
+    8.times{ |y| place_piece([1,y], 'pawn', 'red') }
+    8.times{ |y| place_piece([6,y], 'pawn', 'blue') }
   end
 
-  #calls 'moves' on piece
+
   def move_piece( start_pos, end_pos, team )
-    raise "no piece there" if self[start_pos].nil?
-    if move_into_check( start_pos, end_pos, self[start_pos].team )
-      raise "cant move into check"
+    if self[start_pos].nil?
+      raise ArgumentError.new "You tried to move an empty square!"
+    end
+    if move_into_check?( start_pos, end_pos, self[start_pos].team )
+      raise ArgumentError.new "I can't let you do that, Dave."
     end
     piece_to_move = self[start_pos]
     if piece_to_move.moves.include?(end_pos)
-      # if self[end_pos].team != self.team
-      #
       self[end_pos] = piece_to_move
       self[start_pos] = nil
-
       piece_to_move.position = end_pos[0], end_pos[1]
     else
-      raise "Invalid move."
+      raise ArgumentError.new "That doesn't seem like a good idea."
     end
   end
 
@@ -114,7 +112,6 @@ class Board
   end
 
   def render
-
     display = @grid.map do |row|
       row.map do |square|
         if square.nil?
@@ -128,19 +125,18 @@ class Board
     display.each_with_index do |row, ind|
       row.map!.with_index do
         |x,i| if ind.odd? && i.odd?
-           x.colorize(:background => :white)
-         elsif ind.even? && i.even?
-           x.colorize(:background => :white)
-         else
-           x
-         end
-       end
+          x.colorize(:background => :white)
+        elsif ind.even? && i.even?
+          x.colorize(:background => :white)
+        else
+          x
+        end
+      end
     end
-    puts "X"
-    display.map!{|row|  row.join('') }
 
+    display.map!{|row|  row.join('') }
     display.each_with_index{|row, ind| puts "#{ind} #{row}"}
-    puts "  0 1 2 3 4 5 6 7 <= Y"
+    puts "  a b c d e f g h"
   end
 
   def find_king(color)
@@ -148,7 +144,7 @@ class Board
     self.grid.each_with_index do |row, row_index|
       row.each do |item|
         if item.class == King && item.team == color
-          #puts "Row and column of #{color} king: #{item.position}"
+          # uts "Row and column of #{color} king: #{item.position}"
           return item.position
         end
       end
@@ -160,15 +156,39 @@ class Board
     @grid.each do |row|
       row.each do |square|
         unless square.nil?
-          return true if square.moves.include?(find_king(color))
+           if square.moves.include?(find_king(color))
+             # if square.class == Pawn
+#                copy = square.moves.dup
+#                copy.delete_if{|x| x[1] == square.position[1]}
+#                return true if copy.include?(find_king(color))
+#              else
+               return true
+
+           end
         end
       end
     end
     false
   end
 
+  def checkmate?(color)
+    # debugger
+    moves_left = 0
+    @grid.each do |row|
+      row.each do |square|
+        next if square.nil?
+        next if square.team != color
+        square.moves.each do |move|
+          next if !move || move.empty?
+          unless move_into_check?(square.position, move, color)
+            moves_left += 1
+          end
+        end
+      end
+    end
+    # debugger
+    moves_left == 0 ? true : false
+  end
 
 end
 
-class Game
-end

@@ -7,9 +7,28 @@ WEST            = [0 , -1]
 NORTH             = [-1 , 0]
 SOUTH            = [1 , 0]
 NORTHEAST        = [-1 , 1]
-SOUTHEAST        = [-1 , -1]
-NORTHWEST        = [1 , 1]
+SOUTHEAST        = [1 , 1]
+NORTHWEST        = [-1 , -1]
 SOUTHWEST        = [1 , -1]
+
+CHESSNOTATION = {
+  :a => 0,
+
+  :b => 1,
+
+  :c => 2,
+
+  :d => 3,
+
+  :e => 4,
+
+  :f => 5,
+
+  :g => 6,
+
+  :h => 7
+
+}
 
 class Array
   def merge_sum
@@ -25,7 +44,6 @@ class Piece
     @board        = board
     @team = team
   end
-
 
   #sliding_piece overrides this method for special version for sliding pieces
   def legal_moves(end_position)
@@ -63,31 +81,31 @@ class SlidingPiece < Piece
         moves
         break
       end
-      end
-      moves
     end
-
-    #called by 'moves
-    #calls 'legal_moves'
-    def cardinal_directions
-      legal_moves(NORTH) +
-      legal_moves(EAST) +
-      legal_moves(SOUTH) +
-      legal_moves(WEST)
-    end
-
-    def diagonal_directions
-      legal_moves(NORTHWEST) +
-      legal_moves(NORTHEAST) +
-      legal_moves(SOUTHWEST) +
-      legal_moves(SOUTHEAST)
-    end
+    moves
   end
+
+  #called by 'moves
+  #calls 'legal_moves'
+  def cardinal_directions
+    legal_moves(NORTH) +
+    legal_moves(EAST) +
+    legal_moves(SOUTH) +
+    legal_moves(WEST)
+  end
+
+  def diagonal_directions
+    legal_moves(NORTHWEST) +
+    legal_moves(NORTHEAST) +
+    legal_moves(SOUTHWEST) +
+    legal_moves(SOUTHEAST)
+  end
+end
 
 class Bishop < SlidingPiece
   def initialize(position, board, team)
     super
-   @sigil = team == "red" ? "\u{265D} ".colorize(:red) : "\u{265D} ".colorize(:blue)
+    @sigil = team == "red" ? "\u{265D} ".colorize(:red) : "\u{265D} ".colorize(:blue)
   end
 
   def moves
@@ -180,16 +198,16 @@ class King < SteppingPiece
   end
 
   def moves
-      good_spots = []
+    good_spots = []
 
+    start = @position.dup
+    KDELTS.each do |delta|
+      start[0] += delta[0]
+      start[1] += delta[1]
+      good_spots << legal_moves(start)
       start = @position.dup
-      KDELTS.each do |delta|
-        start[0] += delta[0]
-        start[1] += delta[1]
-        good_spots << legal_moves(start)
-        start = @position.dup
-      end
-      good_spots.select {|x| x != []}
+    end
+    good_spots.select {|x| x != []}
   end
 
 end
@@ -199,10 +217,10 @@ class Pawn < Piece
     super
     @start_position = position
     @sigil = if team == "red"
-     "\u{265F} ".colorize(:red)
-   else
-     "\u{265F} ".colorize(:blue)
-   end
+      "\u{265F} ".colorize(:red)
+    else
+      "\u{265F} ".colorize(:blue)
+    end
   end
 
   def moves
@@ -217,6 +235,7 @@ class Pawn < Piece
       output << check_enemies(SOUTHEAST)
       output << check_enemies(SOUTHWEST)
     end
+    output.reject { |x| x.empty? }
   end
 
   def check_enemies(direction)
@@ -225,27 +244,31 @@ class Pawn < Piece
     pos[0] += direction[0]
     pos[1] += direction[1]
     if pos.all? do |x|
-       x < 8 && x > -1
-     end && @board[pos] != nil && @board[pos].team != self.team
-      output << pos
-    end
-    output.flatten
+      x < 8 && x > -1
+    end && @board[pos] != nil && @board[pos].team != self.team
+    output << pos
   end
+  output.flatten
+end
 
-  def add_steps(direction)
-    output = []
-    pos = @position.dup
-    if @start_position == pos
-      2.times do
-        pos[0] += direction[0]
+def add_steps(direction)
+  output = []
+  pos = @position.dup
+  if @start_position == pos
+    2.times do
+      pos[0] += direction[0]
+      unless @board[pos] != nil
         output << pos.dup
       end
-    else
-      pos[0] += direction[0]
+    end
+  else
+    pos[0] += direction[0]
+    unless @board[pos] != nil
       output << pos
     end
-    output
   end
+  output
+end
 
 
 
@@ -254,30 +277,42 @@ end
 
 
 
-b = Board.new
-start = [7,0]
-ends = [0,0]
-go = [0,1]
-gogo = [0,2]
-soclose = [0,3]
+# b = Board.new
+# start = [6,1]
+# ends = [4,1]
+#
+# go = [6,2]
+# gogo = [5,2]
+#
+# soclose = [1,3]
+# almost = [2,3]
+#
+# czech = [0,4]
+# meight = [4,0]
 
 
-    # b.render
-    # b.move_piece(start,ends)
-    # p b[ends].moves
-    # b.move_piece(ends, go)
-    # b.render
-    # b.move_piece(go, gogo)
-    # b.render
-    # b.move_piece(gogo, soclose)
-    # b.render
-    # p b.in_check?("red")
-    # b.move_piece(soclose, [0,3])
-    # b.render
-    # b.move_piece([0,3], [2, 2])
-    # b.render
+# b.render
+# b.move_piece(start,ends)
+# p b[ends].moves
+# b.move_piece(ends, go)
+# b.render
+# b.move_piece(go, gogo)
+# b.render
+# b.move_piece(gogo, soclose)
+# b.render
+# p b.in_check?("red")
+# b.move_piece(soclose, [0,3])
+# b.render
+# b.move_piece([0,3], [2, 2])
+# b.render
 
-    b.move_piece([7,3],[6,4], "blue")
-b.render
-p b.in_check?("red")
-
+# b.move_piece([7,3],[6,4], "blue")
+# b.render
+# p b.in_check?("red")
+# b.render
+# b.move_piece(start, ends, "blue")
+# b.move_piece(soclose, almost, "red")
+# b.move_piece(go, gogo, "blue")
+# b.move_piece(czech, meight, "red")
+# b.render
+# p b.checkmate?("blue")
